@@ -7,8 +7,20 @@ alternative to ncurses. See https://github.com/nsf/termbox
 To install:
 
     $ # Follow installation instructions for termbox
+    $
+    $ # Clone repo
     $ git clone https://github.com/adsr/termbox-php.git
     $ cd termbox-php
+    $
+    $ # Build extension
     $ phpize && ./configure && make
+    $
+    $ # Run keyboard demo
     $ php -denable_dl=on -dextension=`pwd`/modules/termbox.so termbox.php
+    $
+    $ # Optionally install
     $ sudo make install
+
+Screenshot:
+
+![termbox-php in action](http://i.imgur.com/vI52dsl.png)
