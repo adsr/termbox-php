@@ -21,6 +21,6 @@ To install:
     $ # Optionally install
     $ sudo make install
 
-Screenshot:
+Screenshot of termbox-php in action:
 
 ![termbox-php in action](http://i.imgur.com/vI52dsl.png)
