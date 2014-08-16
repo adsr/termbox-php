@@ -1,0 +1,13 @@
+// $Id$
+// vim:ft=javascript
+
+// If your extension references something external, use ARG_WITH
+// ARG_WITH("termbox", "for termbox support", "no");
+
+// Otherwise, use ARG_ENABLE
+// ARG_ENABLE("termbox", "enable termbox support", "no");
+
+if (PHP_TERMBOX != "no") {
+	EXTENSION("termbox", "termbox.c");
+}
+
