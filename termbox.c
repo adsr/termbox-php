@@ -259,7 +259,7 @@ PHP_FUNCTION(termbox_peek_event)
     struct tb_event event;
     int rc;
 
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "zl", &event, &timeout_ms) == FAILURE) {
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "zl", &event_arr, &timeout_ms) == FAILURE) {
         return;
     }
 
@@ -281,7 +281,7 @@ PHP_FUNCTION(termbox_poll_event)
     struct tb_event event;
     int rc;
 
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z", &event) == FAILURE) {
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z", &event_arr) == FAILURE) {
         return;
     }
 
@@ -339,7 +339,7 @@ PHP_FUNCTION(termbox_utf8_unicode_to_char)
 PHP_FUNCTION(termbox_print)
 {
     char *str;
-    int str_len, processed_len;
+    int str_len;
     long x, y, fg, bg;
     uint32_t unicode;
 
@@ -347,15 +347,14 @@ PHP_FUNCTION(termbox_print)
         return;
     }
 
-    processed_len = 0;
-    while (processed_len < str_len) {
-        processed_len += tb_utf8_char_to_unicode(&unicode, str);
-        str += processed_len;
-        tb_change_cell(x, y, unicode, fg, bg);
-        x += 1;
+    if (str_len > 0) {
+        while (*str) {
+            str += tb_utf8_char_to_unicode(&unicode, str);
+            tb_change_cell(x, y, unicode, fg, bg);
+            x += 1;
+        }
     }
 }
-
 
 /*
  * Local variables:
