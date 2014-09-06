@@ -21,9 +21,8 @@ function main() {
     draw_keyboard();
     termbox_present();
 
-    $ev = null;
     $ctrlxpressed = false;
-    while (termbox_poll_event($ev)) {
+    while (false !== ($ev = termbox_poll_event())) {
         switch ($ev['type']) {
             case TB_EVENT_KEY:
                 if ($ev['key'] == TB_KEY_CTRL_Q && $ctrlxpressed) {
