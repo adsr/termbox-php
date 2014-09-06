@@ -117,6 +117,9 @@ PHP_MINFO_FUNCTION(termbox)
    other functions. */
 PHP_FUNCTION(termbox_init)
 {
+    if (zend_parse_parameters_none() == FAILURE) {
+        return;
+    }
     RETURN_LONG(tb_init());
 }
 /* }}} */
@@ -126,6 +129,9 @@ PHP_FUNCTION(termbox_init)
    function. */
 PHP_FUNCTION(termbox_shutdown)
 {
+    if (zend_parse_parameters_none() == FAILURE) {
+        return;
+    }
     tb_shutdown();
 }
 /* }}} */
@@ -134,6 +140,9 @@ PHP_FUNCTION(termbox_shutdown)
    Returns the width of the buffer. */
 PHP_FUNCTION(termbox_width)
 {
+    if (zend_parse_parameters_none() == FAILURE) {
+        return;
+    }
     RETURN_LONG(tb_width());
 }
 /* }}} */
@@ -142,6 +151,9 @@ PHP_FUNCTION(termbox_width)
    Returns the height of the buffer. */
 PHP_FUNCTION(termbox_height)
 {
+    if (zend_parse_parameters_none() == FAILURE) {
+        return;
+    }
     RETURN_LONG(tb_height());
 }
 /* }}} */
@@ -151,6 +163,9 @@ PHP_FUNCTION(termbox_height)
    termbox_set_clear_attributes(). */
 PHP_FUNCTION(termbox_clear)
 {
+    if (zend_parse_parameters_none() == FAILURE) {
+        return;
+    }
     tb_clear();
 }
 /* }}} */
@@ -171,6 +186,9 @@ PHP_FUNCTION(termbox_set_clear_attributes)
    Syncronizes the internal back buffer with the terminal. */
 PHP_FUNCTION(termbox_present)
 {
+    if (zend_parse_parameters_none() == FAILURE) {
+        return;
+    }
     tb_present();
 }
 /* }}} */
