@@ -1,5 +1,5 @@
 --TEST--
-Check correctness of UTF-8 functions
+Check Unicode to UTF-8 conversion
 --SKIPIF--
 <?php if (!extension_loaded("termbox")) print "skip"; ?>
 --FILE--
