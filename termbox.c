@@ -251,12 +251,12 @@ PHP_FUNCTION(termbox_select_output_mode)
 /* {{{ Convert a termbox event to a PHP array
  */
 static void _termbox_event_to_php_array(struct tb_event *event, zval *event_arr) {
-    add_assoc_long(event_arr, "type", (long)event->type);
-    add_assoc_long(event_arr, "mod", (long)event->mod);
-    add_assoc_long(event_arr, "key", (long)event->key);
-    add_assoc_long(event_arr, "ch", (long)event->ch);
-    add_assoc_long(event_arr, "w", (long)event->w);
-    add_assoc_long(event_arr, "h", (long)event->h);
+    add_assoc_long_ex(event_arr, "type", sizeof("type"), (long)event->type);
+    add_assoc_long_ex(event_arr, "mod", sizeof("mod"), (long)event->mod);
+    add_assoc_long_ex(event_arr, "key", sizeof("key"), (long)event->key);
+    add_assoc_long_ex(event_arr, "ch", sizeof("ch"), (long)event->ch);
+    add_assoc_long_ex(event_arr, "w", sizeof("w"), (long)event->w);
+    add_assoc_long_ex(event_arr, "h", sizeof("h"), (long)event->h);
 }
 /* }}} */
 
