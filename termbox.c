@@ -308,10 +308,14 @@ PHP_FUNCTION(termbox_utf8_char_to_unicode)
         return;
     }
 
-    rc = tb_utf8_char_to_unicode(&unicode_int, (const char*)str);
+    if (str_len > 0) {
+        rc = tb_utf8_char_to_unicode(&unicode_int, str);
+    } else {
+        unicode_int = 0;
+    }
 
-    convert_to_long_ex(&unicode);
-    Z_LVAL_P(unicode) = unicode_int;
+    zval_dtor(unicode);
+    ZVAL_LONG(unicode, unicode_int);
 
     RETURN_LONG(rc);
 }
@@ -329,7 +333,12 @@ PHP_FUNCTION(termbox_utf8_unicode_to_char)
         return;
     }
 
-    str_len = tb_utf8_unicode_to_char((char*)&str, (uint32_t)unicode);
+    if (unicode > 0) {
+        str_len = tb_utf8_unicode_to_char((char*)&str, (uint32_t)unicode);
+    } else {
+        sprintf(str, "");
+        str_len = 0;
+    }
 
     RETURN_STRINGL(str, str_len, 1);
 }
