@@ -26,11 +26,11 @@ extern zend_module_entry termbox_module_entry;
 #define phpext_termbox_ptr &termbox_module_entry
 
 #ifdef PHP_WIN32
-#	define PHP_TERMBOX_API __declspec(dllexport)
+#    define PHP_TERMBOX_API __declspec(dllexport)
 #elif defined(__GNUC__) && __GNUC__ >= 4
-#	define PHP_TERMBOX_API __attribute__ ((visibility("default")))
+#    define PHP_TERMBOX_API __attribute__ ((visibility("default")))
 #else
-#	define PHP_TERMBOX_API
+#    define PHP_TERMBOX_API
 #endif
 
 #ifdef ZTS
@@ -62,7 +62,7 @@ PHP_FUNCTION(termbox_utf8_char_to_unicode);
 PHP_FUNCTION(termbox_utf8_unicode_to_char);
 PHP_FUNCTION(termbox_print);
 
-#endif	/* PHP_TERMBOX_H */
+#endif    /* PHP_TERMBOX_H */
 
 /*
  * Local variables:

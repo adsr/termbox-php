@@ -51,7 +51,7 @@ const zend_function_entry termbox_functions[] = {
     PHP_FE(termbox_utf8_char_to_unicode, NULL)
     PHP_FE(termbox_utf8_unicode_to_char, NULL)
     PHP_FE(termbox_print, NULL)
-	PHP_FE_END	/* Must be the last line in termbox_functions[] */
+    PHP_FE_END    /* Must be the last line in termbox_functions[] */
 };
 /* }}} */
 
@@ -59,19 +59,19 @@ const zend_function_entry termbox_functions[] = {
  */
 zend_module_entry termbox_module_entry = {
 #if ZEND_MODULE_API_NO >= 20010901
-	STANDARD_MODULE_HEADER,
+    STANDARD_MODULE_HEADER,
 #endif
-	"termbox",
-	termbox_functions,
-	PHP_MINIT(termbox),
-	PHP_MSHUTDOWN(termbox),
+    "termbox",
+    termbox_functions,
+    PHP_MINIT(termbox),
+    PHP_MSHUTDOWN(termbox),
     NULL,
     NULL,
-	PHP_MINFO(termbox),
+    PHP_MINFO(termbox),
 #if ZEND_MODULE_API_NO >= 20010901
-	PHP_TERMBOX_VERSION,
+    PHP_TERMBOX_VERSION,
 #endif
-	STANDARD_MODULE_PROPERTIES
+    STANDARD_MODULE_PROPERTIES
 };
 /* }}} */
 
@@ -88,7 +88,7 @@ PHP_MINIT_FUNCTION(termbox)
         zend_register_long_constant(#NAME, sizeof(#NAME), NAME, CONST_CS | CONST_PERSISTENT, module_number TSRMLS_CC);
     #include "constants.h"
     #undef PHP_TERMBOX_CONSTANT
-	return SUCCESS;
+    return SUCCESS;
 }
 /* }}} */
 
@@ -96,7 +96,7 @@ PHP_MINIT_FUNCTION(termbox)
  */
 PHP_MSHUTDOWN_FUNCTION(termbox)
 {
-	return SUCCESS;
+    return SUCCESS;
 }
 /* }}} */
 
@@ -104,11 +104,11 @@ PHP_MSHUTDOWN_FUNCTION(termbox)
  */
 PHP_MINFO_FUNCTION(termbox)
 {
-	php_info_print_table_start();
-	php_info_print_table_header(2, "termbox support", "enabled");
+    php_info_print_table_start();
+    php_info_print_table_header(2, "termbox support", "enabled");
     php_info_print_table_header(2, "extension version", PHP_TERMBOX_VERSION);
     php_info_print_table_header(2, "libtermbox version", "1.0.0");
-	php_info_print_table_end();
+    php_info_print_table_end();
 }
 /* }}} */
 
