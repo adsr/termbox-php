@@ -326,7 +326,7 @@ PHP_FUNCTION(termbox_utf8_unicode_to_char)
     if (unicode > 0) {
         str_len = tb_utf8_unicode_to_char((char*)&str, (uint32_t)unicode);
     } else {
-        sprintf(str, "");
+        str[0] = '\0';
         str_len = 0;
     }
 
