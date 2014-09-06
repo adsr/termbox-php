@@ -233,12 +233,6 @@ PHP_FUNCTION(termbox_select_output_mode)
 /* {{{ Convert a termbox event to a PHP array
  */
 static void _termbox_event_to_php_array(struct tb_event *event, zval *event_arr) {
-    if (Z_TYPE_P(event_arr) != IS_ARRAY) {
-        zval_dtor(event_arr);
-        array_init(event_arr);
-    } else {
-        zend_hash_clean(Z_ARRVAL_P(event_arr));
-    }
     add_assoc_long(event_arr, "type", (long)event->type);
     add_assoc_long(event_arr, "mod", (long)event->mod);
     add_assoc_long(event_arr, "key", (long)event->key);
@@ -248,76 +242,72 @@ static void _termbox_event_to_php_array(struct tb_event *event, zval *event_arr)
 }
 /* }}} */
 
-/* {{{ proto int termbox_peek_event(array &event, int timeout_ms)
-   Wait for an event up to 'timeout' milliseconds and fill the 'event' array
-   with it, when the event is available. Returns the type of the event (one of
-   TB_EVENT_* constants) or -1 if there was an error or 0 in case there were
-   no event during 'timeout' period. */
+/* {{{ proto mixed termbox_peek_event(int timeout_ms)
+   Wait for an event up to 'timeout' milliseconds. If an event was available,
+   return an array containing event info. If no event was available, return
+   NULL. If an error occurred, return FALSE. */
 PHP_FUNCTION(termbox_peek_event)
 {
-    zval *event_arr;
     long timeout_ms;
     struct tb_event event;
     int rc;
 
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "zl", &event_arr, &timeout_ms) == FAILURE) {
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &timeout_ms) == FAILURE) {
         return;
     }
 
-    if ((rc = tb_peek_event(&event, (int)timeout_ms)) > 0) {
-        _termbox_event_to_php_array(&event, event_arr);
+    rc = tb_peek_event(&event, (int)timeout_ms);
+    if (rc == -1) {
+        RETURN_FALSE;
+    } else if (rc == 0) {
+        RETURN_NULL();
     }
+
+    array_init(return_value);
+    _termbox_event_to_php_array(&event, return_value);
 
     RETURN_LONG(rc);
 }
 /* }}} */
 
-/* {{{ proto int termbox_poll_event(array &event)
-   Wait for an event forever and fill the 'event' array with it, when the
-   event is available. Returns the type of the event (one of TB_EVENT_*
-   constants) or -1 if there was an error. */
+/* {{{ proto mixed termbox_poll_event()
+   Wait for an event forever and return an array containing event info. If an
+   error occurs, return FALSE. */
 PHP_FUNCTION(termbox_poll_event)
 {
-    zval *event_arr;
     struct tb_event event;
-    int rc;
 
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z", &event_arr) == FAILURE) {
+    if (zend_parse_parameters_none() == FAILURE) {
         return;
     }
 
-    if ((rc = tb_poll_event(&event)) > 0) {
-        _termbox_event_to_php_array(&event, event_arr);
+    if (tb_poll_event(&event) == -1) {
+        RETURN_FALSE;
     }
 
-    RETURN_LONG(rc);
+    array_init(return_value);
+    _termbox_event_to_php_array(&event, return_value);
 }
 /* }}} */
 
-/* {{{ proto int termbox_utf8_char_to_unicode(string char, int &unicode)
-   Return the 32-bit unicode value of 'char'. */
+/* {{{ proto mixed termbox_utf8_char_to_unicode(string char)
+   Return the 32-bit unicode value of 'char' or FALSE if 'char' is empty. */
 PHP_FUNCTION(termbox_utf8_char_to_unicode)
 {
     char *str;
     int str_len;
-    zval *unicode;
     uint32_t unicode_int;
     int rc;
 
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sz", &str, &str_len, &unicode) == FAILURE) {
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &str, &str_len) == FAILURE) {
         return;
     }
 
-    if (str_len > 0) {
-        rc = tb_utf8_char_to_unicode(&unicode_int, str);
-    } else {
-        unicode_int = 0;
+    unicode_int = 0;
+    if (str_len < 1 || tb_utf8_char_to_unicode(&unicode_int, str) == TB_EOF) {
+        RETURN_FALSE;
     }
-
-    zval_dtor(unicode);
-    ZVAL_LONG(unicode, unicode_int);
-
-    RETURN_LONG(rc);
+    RETURN_LONG(unicode_int);
 }
 /* }}} */
 
