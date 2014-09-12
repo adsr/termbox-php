@@ -453,7 +453,6 @@ PHP_FUNCTION(termbox_utf8_char_to_unicode)
     char *str;
     int str_len;
     uint32_t unicode_int;
-    int rc;
 
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &str, &str_len) == FAILURE) {
         return;
