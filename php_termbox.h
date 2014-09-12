@@ -37,7 +37,7 @@ extern zend_module_entry termbox_module_entry;
 #include "TSRM.h"
 #endif
 
-#define PHP_TERMBOX_VERSION "0.1"
+#define PHP_TERMBOX_VERSION "1.0.0"
 
 #include <termbox.h>
 
