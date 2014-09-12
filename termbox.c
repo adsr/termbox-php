@@ -56,7 +56,11 @@ const zend_function_entry termbox_functions[] = {
     PHP_FE(termbox_utf8_unicode_to_char, NULL)
     PHP_FE(termbox_print, NULL)
     PHP_FE(termbox_last_error, NULL)
+#ifdef PHP_FE_END
     PHP_FE_END    /* Must be the last line in termbox_functions[] */
+#else
+    {NULL, NULL, NULL}
+#endif
 };
 /* }}} */
 
