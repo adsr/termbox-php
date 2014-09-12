@@ -32,30 +32,75 @@
 
 ZEND_DECLARE_MODULE_GLOBALS(termbox)
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_termbox_none, 0, 0, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_termbox_set_clear_attributes, 0, 0, 2)
+        ZEND_ARG_INFO(0, fg)
+        ZEND_ARG_INFO(0, bg)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_termbox_set_cursor, 0, 0, 2)
+        ZEND_ARG_INFO(0, x)
+        ZEND_ARG_INFO(0, y)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_termbox_change_cell, 0, 0, 5)
+        ZEND_ARG_INFO(0, x)
+        ZEND_ARG_INFO(0, y)
+        ZEND_ARG_INFO(0, ch)
+        ZEND_ARG_INFO(0, fg)
+        ZEND_ARG_INFO(0, bg)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_termbox_mode, 0, 0, 1)
+        ZEND_ARG_INFO(0, mode)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_termbox_peek_event, 0, 0, 1)
+        ZEND_ARG_INFO(0, timeout_ms)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_termbox_utf8_char_to_unicode, 0, 0, 1)
+        ZEND_ARG_INFO(0, char)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_termbox_utf8_unicode_to_char, 0, 0, 1)
+        ZEND_ARG_INFO(0, unicode)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_termbox_print, 0, 0, 5)
+        ZEND_ARG_INFO(0, str)
+        ZEND_ARG_INFO(0, x)
+        ZEND_ARG_INFO(0, y)
+        ZEND_ARG_INFO(0, fg)
+        ZEND_ARG_INFO(0, bg)
+ZEND_END_ARG_INFO()
+
 /* {{{ termbox_functions[]
  *
  * Every user visible function must have an entry in termbox_functions[].
  */
 const zend_function_entry termbox_functions[] = {
-    PHP_FE(termbox_init, NULL)
-    PHP_FE(termbox_shutdown, NULL)
-    PHP_FE(termbox_width, NULL)
-    PHP_FE(termbox_height, NULL)
-    PHP_FE(termbox_clear, NULL)
-    PHP_FE(termbox_set_clear_attributes, NULL)
-    PHP_FE(termbox_present, NULL)
-    PHP_FE(termbox_set_cursor, NULL)
-    PHP_FE(termbox_change_cell, NULL)
-    PHP_FE(termbox_set_input_mode, NULL)
-    PHP_FE(termbox_get_input_mode, NULL)
-    PHP_FE(termbox_set_output_mode, NULL)
-    PHP_FE(termbox_get_output_mode, NULL)
-    PHP_FE(termbox_peek_event, NULL)
-    PHP_FE(termbox_poll_event, NULL)
-    PHP_FE(termbox_utf8_char_to_unicode, NULL)
-    PHP_FE(termbox_utf8_unicode_to_char, NULL)
-    PHP_FE(termbox_print, NULL)
-    PHP_FE(termbox_last_error, NULL)
+    PHP_FE(termbox_init,                 arginfo_termbox_none)
+    PHP_FE(termbox_shutdown,             arginfo_termbox_none)
+    PHP_FE(termbox_width,                arginfo_termbox_none)
+    PHP_FE(termbox_height,               arginfo_termbox_none)
+    PHP_FE(termbox_clear,                arginfo_termbox_none)
+    PHP_FE(termbox_set_clear_attributes, arginfo_termbox_set_clear_attributes)
+    PHP_FE(termbox_present,              arginfo_termbox_none)
+    PHP_FE(termbox_set_cursor,           arginfo_termbox_set_cursor)
+    PHP_FE(termbox_change_cell,          arginfo_termbox_change_cell)
+    PHP_FE(termbox_set_input_mode,       arginfo_termbox_mode)
+    PHP_FE(termbox_get_input_mode,       arginfo_termbox_none)
+    PHP_FE(termbox_set_output_mode,      arginfo_termbox_mode)
+    PHP_FE(termbox_get_output_mode,      arginfo_termbox_none)
+    PHP_FE(termbox_peek_event,           arginfo_termbox_peek_event)
+    PHP_FE(termbox_poll_event,           arginfo_termbox_none)
+    PHP_FE(termbox_utf8_char_to_unicode, arginfo_termbox_utf8_char_to_unicode)
+    PHP_FE(termbox_utf8_unicode_to_char, arginfo_termbox_utf8_unicode_to_char)
+    PHP_FE(termbox_print,                arginfo_termbox_print)
+    PHP_FE(termbox_last_error,           arginfo_termbox_none)
 #ifdef PHP_FE_END
     PHP_FE_END    /* Must be the last line in termbox_functions[] */
 #else
