@@ -16,7 +16,7 @@ To install:
     $ phpize && ./configure && make
     $
     $ # Run keyboard demo
-    $ php -denable_dl=on -dextension=`pwd`/modules/termbox.so termbox.php
+    $ php -denable_dl=on -dextension=`pwd`/modules/termbox.so examples/termbox.php
     $
     $ # Optionally install
     $ sudo make install
