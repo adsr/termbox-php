@@ -41,6 +41,24 @@ extern zend_module_entry termbox_module_entry;
 
 #include <termbox.h>
 
+#define TB_ERROR_NONE 0
+#define TB_ERROR_NOT_INITIALIZED -100
+#define TB_ERROR_ALREADY_INITIALIZED -101
+#define TB_ERROR_COULD_NOT_READ_INPUT -102
+#define TB_ERROR_INVALID_MODE -103
+
+#define PHP_TERMBOX_ENSURE_INITIALIZED() do { \
+    if (TERMBOX_G(is_initialized) != 1) { \
+        TERMBOX_G(last_error) = TB_ERROR_NOT_INITIALIZED; \
+        RETURN_FALSE; \
+    } \
+} while (0)
+
+ZEND_BEGIN_MODULE_GLOBALS(termbox)
+int is_initialized;
+int last_error;
+ZEND_END_MODULE_GLOBALS(termbox)
+
 PHP_MINIT_FUNCTION(termbox);
 PHP_MSHUTDOWN_FUNCTION(termbox);
 PHP_MINFO_FUNCTION(termbox);
@@ -54,13 +72,22 @@ PHP_FUNCTION(termbox_set_clear_attributes);
 PHP_FUNCTION(termbox_present);
 PHP_FUNCTION(termbox_set_cursor);
 PHP_FUNCTION(termbox_change_cell);
-PHP_FUNCTION(termbox_select_input_mode);
-PHP_FUNCTION(termbox_select_output_mode);
+PHP_FUNCTION(termbox_set_input_mode);
+PHP_FUNCTION(termbox_get_input_mode);
+PHP_FUNCTION(termbox_set_output_mode);
+PHP_FUNCTION(termbox_get_output_mode);
 PHP_FUNCTION(termbox_peek_event);
 PHP_FUNCTION(termbox_poll_event);
 PHP_FUNCTION(termbox_utf8_char_to_unicode);
 PHP_FUNCTION(termbox_utf8_unicode_to_char);
 PHP_FUNCTION(termbox_print);
+PHP_FUNCTION(termbox_last_error);
+
+#ifdef ZTS
+#define TERMBOX_G(v) TSRMG(termbox_globals_id, zend_termbox_globals *, v)
+#else
+#define TERMBOX_G(v) (termbox_globals.v)
+#endif
 
 #endif    /* PHP_TERMBOX_H */
 

@@ -1,7 +1,7 @@
 <?php
 
 if (!extension_loaded('termbox')) {
-	dl('termbox.' . PHP_SHLIB_SUFFIX);
+    dl('termbox.' . PHP_SHLIB_SUFFIX);
 }
 
 if (!function_exists('termbox_init')) {
@@ -10,12 +10,12 @@ if (!function_exists('termbox_init')) {
 }
 
 function main() {
-    if ($ret = termbox_init()) {
-        fwrite(STDERR, "termbox_init failed with error code {$ret}\n");
+    if (!termbox_init()) {
+        fwrite(STDERR, "termbox_init failed with error code " . termbox_last_error() . "\n");
         exit(1);
     }
 
-    termbox_select_input_mode(TB_INPUT_ESC);
+    termbox_set_input_mode(TB_INPUT_ESC);
 
     termbox_clear();
     draw_keyboard();
@@ -30,7 +30,7 @@ function main() {
                     exit(0);
                 } else if ($ev['key'] == TB_KEY_CTRL_C && $ctrlxpressed) {
                     $chmap = [0, 2, 1];
-                    termbox_select_input_mode($chmap[termbox_select_input_mode(0)]);
+                    termbox_set_input_mode($chmap[termbox_get_input_mode()]);
                 }
                 $ctrlxpressed = $ev['key'] == TB_KEY_CTRL_X;
                 termbox_clear();
@@ -538,7 +538,7 @@ function draw_keyboard() {
         "TB_INPUT_ALT"
     ];
     printf_tb(3, 18, TB_WHITE, TB_DEFAULT, "Input mode: %s",
-            $inputmodemap[termbox_select_input_mode(0)]);
+            $inputmodemap[termbox_get_input_mode()]);
 }
 
 function funckeymap($k) {

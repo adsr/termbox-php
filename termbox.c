@@ -30,6 +30,8 @@
 
 #include <termbox.h>
 
+ZEND_DECLARE_MODULE_GLOBALS(termbox)
+
 /* {{{ termbox_functions[]
  *
  * Every user visible function must have an entry in termbox_functions[].
@@ -44,13 +46,16 @@ const zend_function_entry termbox_functions[] = {
     PHP_FE(termbox_present, NULL)
     PHP_FE(termbox_set_cursor, NULL)
     PHP_FE(termbox_change_cell, NULL)
-    PHP_FE(termbox_select_input_mode, NULL)
-    PHP_FE(termbox_select_output_mode, NULL)
+    PHP_FE(termbox_set_input_mode, NULL)
+    PHP_FE(termbox_get_input_mode, NULL)
+    PHP_FE(termbox_set_output_mode, NULL)
+    PHP_FE(termbox_get_output_mode, NULL)
     PHP_FE(termbox_peek_event, NULL)
     PHP_FE(termbox_poll_event, NULL)
     PHP_FE(termbox_utf8_char_to_unicode, NULL)
     PHP_FE(termbox_utf8_unicode_to_char, NULL)
     PHP_FE(termbox_print, NULL)
+    PHP_FE(termbox_last_error, NULL)
     PHP_FE_END    /* Must be the last line in termbox_functions[] */
 };
 /* }}} */
@@ -79,10 +84,21 @@ zend_module_entry termbox_module_entry = {
 ZEND_GET_MODULE(termbox)
 #endif
 
+/* {{{
+ * Initialize module globals */
+static void _termbox_init_globals(zend_termbox_globals *g)
+{
+    memset(g, 0, sizeof(zend_termbox_globals));
+}
+/* }}} */
+
 /* {{{ PHP_MINIT_FUNCTION
  */
 PHP_MINIT_FUNCTION(termbox)
 {
+    /** Init globals */
+    ZEND_INIT_MODULE_GLOBALS(termbox, _termbox_init_globals, NULL);
+
     /** Register constants */
     #define PHP_TERMBOX_CONSTANT(NAME) \
         zend_register_long_constant(#NAME, sizeof(#NAME), NAME, CONST_CS | CONST_PERSISTENT, module_number TSRMLS_CC);
@@ -112,139 +128,206 @@ PHP_MINFO_FUNCTION(termbox)
 }
 /* }}} */
 
-/* {{{ proto int termbox_init(void)
+/* {{{ proto bool termbox_init(void)
    Initializes the termbox library. This function should be called before any
-   other functions. */
+   other functions. Return FALSE if an error occurs. */
 PHP_FUNCTION(termbox_init)
 {
+    int retval;
     if (zend_parse_parameters_none() == FAILURE) {
         return;
     }
-    RETURN_LONG(tb_init());
+    if (TERMBOX_G(is_initialized) == 0) {
+        /** Attempt to initialize */
+        if ((retval = tb_init()) == 0) {
+            /** Success! Set is_initialized to 1 */
+            TERMBOX_G(is_initialized) = 1;
+        } else {
+            /** Failure. Set last_error */
+            TERMBOX_G(last_error) = retval;
+            RETURN_FALSE;
+        }
+    } else {
+        /** Already initialized. Set last_error */
+        TERMBOX_G(last_error) = TB_ERROR_ALREADY_INITIALIZED;
+        RETURN_FALSE;
+    }
+    RETURN_TRUE;
 }
 /* }}} */
 
-/* {{{ proto void termbox_shutdown(void)
+/* {{{ proto bool termbox_shutdown(void)
    After successful initialization, the library must be finalized using this
-   function. */
+   function. Return FALSE if not initialized yet. */
 PHP_FUNCTION(termbox_shutdown)
 {
     if (zend_parse_parameters_none() == FAILURE) {
         return;
     }
+    PHP_TERMBOX_ENSURE_INITIALIZED();
     tb_shutdown();
+    RETURN_TRUE;
 }
 /* }}} */
 
-/* {{{ proto int termbox_width(void)
-   Returns the width of the buffer. */
+/* {{{ proto mixed termbox_width(void)
+   Returns the width of the buffer. Return FALSE if not initialized yet. */
 PHP_FUNCTION(termbox_width)
 {
     if (zend_parse_parameters_none() == FAILURE) {
         return;
     }
+    PHP_TERMBOX_ENSURE_INITIALIZED();
     RETURN_LONG(tb_width());
 }
 /* }}} */
 
-/* {{{ proto void termbox_height(void)
-   Returns the height of the buffer. */
+/* {{{ proto mixed termbox_height(void)
+   Returns the height of the buffer. Return FALSE if not initialized yet. */
 PHP_FUNCTION(termbox_height)
 {
     if (zend_parse_parameters_none() == FAILURE) {
         return;
     }
+    PHP_TERMBOX_ENSURE_INITIALIZED();
     RETURN_LONG(tb_height());
 }
 /* }}} */
 
-/* {{{ proto void termbox_clear(void)
+/* {{{ proto bool termbox_clear(void)
    Clears the buffer using TB_DEFAULT color or the color/attributes set by
-   termbox_set_clear_attributes(). */
+   termbox_set_clear_attributes(). Return FALSE if not initialized yet. */
 PHP_FUNCTION(termbox_clear)
 {
     if (zend_parse_parameters_none() == FAILURE) {
         return;
     }
+    PHP_TERMBOX_ENSURE_INITIALIZED();
     tb_clear();
+    RETURN_TRUE;
 }
 /* }}} */
 
-/* {{{ proto void termbox_set_clear_attributes(int fg, int bg)
-   Sets the default foreground and background attributes. */
+/* {{{ proto bool termbox_set_clear_attributes(int fg, int bg)
+   Sets the default foreground and background attributes. Return FALSE if not
+   initialized yet. */
 PHP_FUNCTION(termbox_set_clear_attributes)
 {
     long fg, bg;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ll", &fg, &bg) == FAILURE) {
         return;
     }
+    PHP_TERMBOX_ENSURE_INITIALIZED();
     tb_set_clear_attributes((uint16_t)fg, (uint16_t)bg);
+    RETURN_TRUE;
 }
 /* }}} */
 
-/* {{{ proto void termbox_present()
-   Syncronizes the internal back buffer with the terminal. */
+/* {{{ proto bool termbox_present()
+   Syncronizes the internal back buffer with the terminal. Return FALSE if not
+   initialized yet. */
 PHP_FUNCTION(termbox_present)
 {
     if (zend_parse_parameters_none() == FAILURE) {
         return;
     }
+    PHP_TERMBOX_ENSURE_INITIALIZED();
     tb_present();
+    RETURN_TRUE;
 }
 /* }}} */
 
-/* {{{ proto void termbox_set_cursor(int x, int y)
+/* {{{ proto bool termbox_set_cursor(int x, int y)
    Sets the position of the cursor. Upper-left character is (0, 0). If you
    pass TB_HIDE_CURSOR as both coordinates, then the cursor will be hidden.
-   Cursor is hidden by default. */
+   Cursor is hidden by default. Return FALSE if not initialized yet. */
 PHP_FUNCTION(termbox_set_cursor)
 {
     long x, y;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ll", &x, &y) == FAILURE) {
         return;
     }
+    PHP_TERMBOX_ENSURE_INITIALIZED();
     tb_set_clear_attributes((int)x, (int)y);
+    RETURN_TRUE;
 }
 /* }}} */
 
-/* {{{ proto void termbox_change_cell(int x, int y, int ch, int fg, int bg)
+/* {{{ proto bool termbox_change_cell(int x, int y, int ch, int fg, int bg)
    Changes cell's parameters in the internal back buffer at the specified
-   position. */
+   position. Return FALSE if not initialized yet. */
 PHP_FUNCTION(termbox_change_cell)
 {
     long x, y, ch, fg, bg;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "lllll", &x, &y, &ch, &fg, &bg) == FAILURE) {
         return;
     }
+    PHP_TERMBOX_ENSURE_INITIALIZED();
     tb_change_cell((int)x, (int)y, (uint32_t)ch, (uint16_t)fg, (uint16_t)bg);
+    RETURN_TRUE;
 }
 /* }}} */
 
-/* {{{ proto int termbox_select_input_mode(int mode)
-    Sets the termbox input mode: TB_INPUT_ESC or TB_INPUT_ALT. If 'mode' is
-    TB_INPUT_CURRENT, it returns the current input mode. */
-PHP_FUNCTION(termbox_select_input_mode)
+/* {{{ proto bool termbox_set_input_mode(int mode)
+    Sets the termbox input mode: TB_INPUT_ESC or TB_INPUT_ALT. Return FALSE
+    if not yet initialized. */
+PHP_FUNCTION(termbox_set_input_mode)
 {
     long mode;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &mode) == FAILURE) {
         return;
     }
-    RETURN_LONG(tb_select_input_mode((int)mode));
+    PHP_TERMBOX_ENSURE_INITIALIZED();
+    if (mode != TB_INPUT_ESC && mode != TB_INPUT_ALT) {
+        TERMBOX_G(last_error) = TB_ERROR_INVALID_MODE;
+        RETURN_FALSE;
+    }
+    tb_select_input_mode((int)mode);
+    RETURN_TRUE;
 }
 /* }}} */
 
-/* {{{ proto int termbox_select_output_mode(int mode)
+/* {{{ proto mixed termbox_get_input_mode()
+    Return the current termbox input mode: TB_INPUT_ESC or TB_INPUT_ALT.
+    Return FALSE if not yet initialized. */
+PHP_FUNCTION(termbox_get_input_mode) {
+    if (zend_parse_parameters_none() == FAILURE) {
+        return;
+    }
+    PHP_TERMBOX_ENSURE_INITIALIZED();
+    RETURN_LONG(tb_select_input_mode(TB_INPUT_CURRENT));
+}
+/* }}} */
+
+/* {{{ proto bool termbox_set_output_mode(int mode)
    Sets the termbox output mode. Termbox has three output options:
-   TB_OUTPUT_256, TB_OUTPUT_216, or TB_OUTPUT_GRAYSCALE. If 'mode' is
-   TB_OUTPUT_CURRENT, it returns the current output mode. */
-PHP_FUNCTION(termbox_select_output_mode)
+   TB_OUTPUT_256, TB_OUTPUT_216, or TB_OUTPUT_GRAYSCALE. Return FALSE if not
+   yet initialized. */
+PHP_FUNCTION(termbox_set_output_mode)
 {
     long mode;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &mode) == FAILURE) {
         return;
     }
-    RETURN_LONG(tb_select_output_mode((int)mode));
+    PHP_TERMBOX_ENSURE_INITIALIZED();
+    if (mode != TB_OUTPUT_256 && mode != TB_OUTPUT_216 && mode != TB_OUTPUT_GRAYSCALE) {
+        TERMBOX_G(last_error) = TB_ERROR_INVALID_MODE;
+        RETURN_FALSE;
+    }
+    tb_select_output_mode((int)mode);
+    RETURN_TRUE;
+}
+/* }}} */
 
+/* {{{ proto mixed termbox_get_output_mode()
+    Return the current termbox output mode: TB_OUTPUT_256, TB_OUTPUT_216, or
+    TB_OUTPUT_GRAYSCALE. Return FALSE if not yet initialized. */
+PHP_FUNCTION(termbox_get_output_mode) {
+    if (zend_parse_parameters_none() == FAILURE) {
+        return;
+    }
+    PHP_TERMBOX_ENSURE_INITIALIZED();
+    RETURN_LONG(tb_select_output_mode(TB_OUTPUT_CURRENT));
 }
 /* }}} */
 
@@ -263,7 +346,7 @@ static void _termbox_event_to_php_array(struct tb_event *event, zval *event_arr)
 /* {{{ proto mixed termbox_peek_event(int timeout_ms)
    Wait for an event up to 'timeout' milliseconds. If an event was available,
    return an array containing event info. If no event was available, return
-   NULL. If an error occurred, return FALSE. */
+   NULL. If an error occurrs, return FALSE. */
 PHP_FUNCTION(termbox_peek_event)
 {
     long timeout_ms;
@@ -274,8 +357,11 @@ PHP_FUNCTION(termbox_peek_event)
         return;
     }
 
+    PHP_TERMBOX_ENSURE_INITIALIZED();
+
     rc = tb_peek_event(&event, (int)timeout_ms);
     if (rc == -1) {
+        TERMBOX_G(last_error) = TB_ERROR_COULD_NOT_READ_INPUT;
         RETURN_FALSE;
     } else if (rc == 0) {
         RETURN_NULL();
@@ -299,7 +385,10 @@ PHP_FUNCTION(termbox_poll_event)
         return;
     }
 
+    PHP_TERMBOX_ENSURE_INITIALIZED();
+
     if (tb_poll_event(&event) == -1) {
+        TERMBOX_G(last_error) = TB_ERROR_COULD_NOT_READ_INPUT;
         RETURN_FALSE;
     }
 
@@ -352,8 +441,9 @@ PHP_FUNCTION(termbox_utf8_unicode_to_char)
 }
 /* }}} */
 
-/* {{{ proto void termbox_print(string str, int x, int y, int fg, int bg)
-   Print str at coordinate x, y with attributes fg, bg. */
+/* {{{ proto bool termbox_print(string str, int x, int y, int fg, int bg)
+   Print str at coordinate x, y with attributes fg, bg. If an error occurs,
+   return FALSE. */
 PHP_FUNCTION(termbox_print)
 {
     char *str;
@@ -365,6 +455,8 @@ PHP_FUNCTION(termbox_print)
         return;
     }
 
+    PHP_TERMBOX_ENSURE_INITIALIZED();
+
     if (str_len > 0) {
         while (*str) {
             str += tb_utf8_char_to_unicode(&unicode, str);
@@ -372,7 +464,20 @@ PHP_FUNCTION(termbox_print)
             x += 1;
         }
     }
+
+    RETURN_TRUE;
 }
+
+/* {{{ proto int termbox_last_error(void)
+   Returns the last error code. */
+PHP_FUNCTION(termbox_last_error)
+{
+    if (zend_parse_parameters_none() == FAILURE) {
+        return;
+    }
+    RETURN_LONG(TERMBOX_G(last_error));
+}
+/* }}} */
 
 /*
  * Local variables:
