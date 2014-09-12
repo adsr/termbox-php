@@ -123,7 +123,7 @@ PHP_MINFO_FUNCTION(termbox)
     php_info_print_table_start();
     php_info_print_table_header(2, "termbox support", "enabled");
     php_info_print_table_header(2, "extension version", PHP_TERMBOX_VERSION);
-    php_info_print_table_header(2, "libtermbox version", "1.0.0");
+    /** TODO libtermbox version? */
     php_info_print_table_end();
 }
 /* }}} */

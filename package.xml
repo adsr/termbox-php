@@ -15,15 +15,15 @@ See https://github.com/nsf/termbox for more info.</description>
  <date>2014-09-11</date>
  <time>20:57:06</time>
  <version>
-  <release>1.0.0</release>
-  <api>1.0.0</api>
+  <release>0.1.0</release>
+  <api>0.1.0</api>
  </version>
  <stability>
-  <release>stable</release>
-  <api>stable</api>
+  <release>beta</release>
+  <api>beta</api>
  </stability>
- <license uri="http://www.php.net/license">PHP</license>
- <notes/>
+ <license uri="http://www.apache.org/licenses/LICENSE-2.0">Apache</license>
+ <notes>Initial release</notes>
  <contents>
   <dir name="/">
    <dir name="build">
@@ -41,6 +41,7 @@ See https://github.com/nsf/termbox for more info.</description>
     <file role="test" name="002.phpt"/>
     <file role="test" name="003.phpt"/>
     <file role="test" name="004.phpt"/>
+    <file role="test" name="005.phpt"/>
    </dir>
    <file role="src" name="acinclude.m4"/>
    <file role="src" name="aclocal.m4"/>
@@ -67,16 +68,16 @@ See https://github.com/nsf/termbox for more info.</description>
  <changelog>
   <release>
    <version>
-    <release>1.0.0</release>
-    <api>1.0.0</api>
+    <release>0.1.0</release>
+    <api>0.1.0</api>
    </version>
    <stability>
-    <release>stable</release>
-    <api>stable</api>
+    <release>beta</release>
+    <api>beta</api>
    </stability>
    <date>2014-09-11</date>
-   <license uri="http://www.php.net/license">PHP</license>
-   <notes/>
+   <license uri="http://www.apache.org/licenses/LICENSE-2.0">Apache</license>
+   <notes>Initial release</notes>
   </release>
  </changelog>
 </package>
