@@ -418,8 +418,6 @@ PHP_FUNCTION(termbox_peek_event)
 
     array_init(return_value);
     _termbox_event_to_php_array(&event, return_value);
-
-    RETURN_LONG(rc);
 }
 /* }}} */
 
