@@ -30,6 +30,16 @@
 
 #include <termbox.h>
 
+#if PHP_MAJOR_VERSION >= 7
+    #define COMPAT_RETURN_STRINGL(str, len, dup) RETURN_STRINGL(str, len)
+    #define COMPAT_STRLEN_DELTA 1
+    #define compat_strlen_t size_t
+#else
+    #define COMPAT_RETURN_STRINGL(str, len, dup) RETURN_STRINGL(str, len, dup)
+    #define COMPAT_STRLEN_DELTA 0
+    #define compat_strlen_t int
+#endif
+
 ZEND_DECLARE_MODULE_GLOBALS(termbox)
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_termbox_none, 0, 0, 0)
@@ -150,7 +160,7 @@ PHP_MINIT_FUNCTION(termbox)
 
     /** Register constants */
     #define PHP_TERMBOX_CONSTANT(NAME) \
-        zend_register_long_constant(#NAME, sizeof(#NAME), NAME, CONST_CS | CONST_PERSISTENT, module_number TSRMLS_CC);
+        zend_register_long_constant(#NAME, sizeof(#NAME)-COMPAT_STRLEN_DELTA, NAME, CONST_CS | CONST_PERSISTENT, module_number TSRMLS_CC);
     #include "constants.h"
     #undef PHP_TERMBOX_CONSTANT
     return SUCCESS;
@@ -383,12 +393,12 @@ PHP_FUNCTION(termbox_get_output_mode) {
 /* {{{ Convert a termbox event to a PHP array
  */
 static void _termbox_event_to_php_array(struct tb_event *event, zval *event_arr) {
-    add_assoc_long_ex(event_arr, "type", sizeof("type"), (long)event->type);
-    add_assoc_long_ex(event_arr, "mod", sizeof("mod"), (long)event->mod);
-    add_assoc_long_ex(event_arr, "key", sizeof("key"), (long)event->key);
-    add_assoc_long_ex(event_arr, "ch", sizeof("ch"), (long)event->ch);
-    add_assoc_long_ex(event_arr, "w", sizeof("w"), (long)event->w);
-    add_assoc_long_ex(event_arr, "h", sizeof("h"), (long)event->h);
+    add_assoc_long_ex(event_arr, "type", sizeof("type")-COMPAT_STRLEN_DELTA, (long)event->type);
+    add_assoc_long_ex(event_arr, "mod", sizeof("mod")-COMPAT_STRLEN_DELTA, (long)event->mod);
+    add_assoc_long_ex(event_arr, "key", sizeof("key")-COMPAT_STRLEN_DELTA, (long)event->key);
+    add_assoc_long_ex(event_arr, "ch", sizeof("ch")-COMPAT_STRLEN_DELTA, (long)event->ch);
+    add_assoc_long_ex(event_arr, "w", sizeof("w")-COMPAT_STRLEN_DELTA, (long)event->w);
+    add_assoc_long_ex(event_arr, "h", sizeof("h")-COMPAT_STRLEN_DELTA, (long)event->h);
 }
 /* }}} */
 
@@ -449,7 +459,7 @@ PHP_FUNCTION(termbox_poll_event)
 PHP_FUNCTION(termbox_utf8_char_to_unicode)
 {
     char *str;
-    int str_len;
+    compat_strlen_t str_len;
     uint32_t unicode_int;
 
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &str, &str_len) == FAILURE) {
@@ -483,7 +493,7 @@ PHP_FUNCTION(termbox_utf8_unicode_to_char)
         str_len = 0;
     }
 
-    RETURN_STRINGL(str, str_len, 1);
+    COMPAT_RETURN_STRINGL(str, str_len, 1);
 }
 /* }}} */
 
