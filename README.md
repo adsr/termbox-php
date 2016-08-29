@@ -4,7 +4,7 @@ termbox-php
 termbox-php is a termbox wrapper for PHP. Termbox is a robust, minimal
 alternative to ncurses. See https://github.com/nsf/termbox
 
-To install:
+Install from source:
 
     $ # Follow installation instructions for termbox
     $
@@ -20,6 +20,10 @@ To install:
     $
     $ # Optionally install
     $ sudo make install
+
+or install via PECL:
+
+    $ sudo pecl install termbox-0.1.3
 
 Screenshot of termbox-php in action:
 
