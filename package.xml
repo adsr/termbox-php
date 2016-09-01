@@ -14,10 +14,10 @@ See https://github.com/nsf/termbox for the underlying library.</description>
   <email>as@php.net</email>
   <active>yes</active>
  </lead>
- <date>2014-11-20</date>
+ <date>2016-09-01</date>
  <time>01:14:00</time>
  <version>
-  <release>0.1.2</release>
+  <release>0.1.3</release>
   <api>0.1.0</api>
  </version>
  <stability>
@@ -25,15 +25,11 @@ See https://github.com/nsf/termbox for the underlying library.</description>
   <api>beta</api>
  </stability>
  <license uri="http://www.apache.org/licenses/LICENSE-2.0">Apache</license>
- <notes>fix termbox_peek_event return value</notes>
+ <notes>php7 compat</notes>
  <contents>
   <dir name="/">
    <dir name="build">
     <file role="src" name="libtool.m4"/>
-    <file role="src" name="ltoptions.m4"/>
-    <file role="src" name="ltsugar.m4"/>
-    <file role="src" name="ltversion.m4"/>
-    <file role="src" name="lt~obsolete.m4"/>
    </dir>
    <dir name="examples">
     <file role="doc" name="termbox.php"/>
@@ -69,6 +65,19 @@ See https://github.com/nsf/termbox for the underlying library.</description>
  <providesextension>termbox</providesextension>
  <extsrcrelease/>
  <changelog>
+  <release>
+   <version>
+    <release>0.1.3</release>
+    <api>0.1.0</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <date>2016-09-01</date>
+   <license uri="http://www.apache.org/licenses/LICENSE-2.0">Apache</license>
+   <notes>php7 compat</notes>
+  </release>
   <release>
    <version>
     <release>0.1.2</release>
